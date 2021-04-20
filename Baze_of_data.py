@@ -2,7 +2,7 @@ from telebot import types
 # from telebot import types
 from random import shuffle
 from SQLighter import SQLighter
-from config import database_name, shelve_name, database_name2
+from config import database_name, database_name2
 
 slovar = {}
 
@@ -10,6 +10,16 @@ def count_rows_musiv():
     db = SQLighter(database_name)
     rowsnum = db.count_rows()
     slovar['rows_count1'] = rowsnum
+
+def set_name_from_user(NAME):
+    slovar['name'] = NAME
+
+def get_name_from_user():
+    try:
+        name = slovar['name']
+        return name
+    except KeyError:
+        return None
 
 def count_rows_photo():
     db = SQLighter(database_name2)
@@ -51,3 +61,4 @@ def generate_markup(right_answer, wrong_answers):
     for item in list_items:
         markup.add(item)
     return markup
+
