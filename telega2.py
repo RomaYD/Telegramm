@@ -7,16 +7,37 @@ import utils
 from SQLighter import SQLighter
 from telebot import types
 
-
 bot = telebot.TeleBot(config.token)
 
 
 @bot.message_handler(commands=['game'])
 def game(message):
+    type_of_cntent = 'music'
     db_worker = SQLighter(config.database_name)
-    row = db_worker.select_single(random.randint(1, utils.get_rows_count()))
+    row = db_worker.select_single(random.randint(1, utils.get_rows_count(type_of_cntent)))
     markup = utils.generate_markup(row[2], row[3])
     bot.send_voice(message.chat.id, row[1], reply_markup=markup, duration=20)
+    utils.set_user_game(message.chat.id, row[2])
+    db_worker.close()
+
+
+@bot.message_handler(commands=['test'])
+def find_file_ids(message):
+    for file in os.listdir('music/'):
+        if file.split('.')[-1] == 'ogg':
+            f = open("music/" + file, 'rb')
+            res = bot.send_voice(message.chat.id, f, None)
+            print(res)
+        time.sleep(1)
+
+
+@bot.message_handler(commands=['photo'])
+def choose_photo(message):
+    type_of_cntent = 'photo'
+    db_worker = SQLighter(config.database_name2)
+    row = db_worker.select_single(random.randint(1, utils.get_rows_count(type_of_cntent='photo')))
+    markup = utils.generate_markup(row[2], row[3])
+    bot.send_photo(message.chat.id, row[1], reply_markup=markup)
     utils.set_user_game(message.chat.id, row[2])
     db_worker.close()
 
@@ -35,17 +56,8 @@ def check_answer(message):
         utils.finish_user_game(message.chat.id)
 
 
-@bot.message_handler(commands=['test'])
-def find_file_ids(message):
-    for file in os.listdir('music/'):
-        if file.split('.')[-1] == 'ogg':
-            f = open("music/" + file, 'rb')
-            res = bot.send_voice(message.chat.id, f, None)
-            print(res)
-        time.sleep(3)
-
-
 if __name__ == '__main__':
-    utils.count_rows()
+    utils.count_rows_photo()
+    utils.count_rows_musiv()
     random.seed()
     bot.infinity_polling()
