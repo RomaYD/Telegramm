@@ -12,6 +12,7 @@ import urllib
 from urllib import request
 
 bot = telebot.TeleBot(config.token)
+# перечень команд подсказок
 comands = {"start": "Приветствие и установка имени",
            "help": "Помощь",
            "music": "Угадай мелодию",
@@ -21,6 +22,7 @@ comands = {"start": "Приветствие и установка имени",
            }
 
 
+# задание имени, по которому бот будет обращаться к пользователю, имя необходимо писать после команды через пробел
 @bot.message_handler(commands=['registration'])
 def register(message):
     mes = message.text.split()
@@ -28,25 +30,26 @@ def register(message):
     mes = ' '.join(mes)
     Base_of_data.set_name_from_user(mes)
 
-
+# приветственное сообщение
 @bot.message_handler(commands=['start'])
 def welcome(message):
     if Base_of_data.get_name_from_user():
         name = Base_of_data.get_name_from_user()
     else:
-        name = message.from_user.first_name
+        name = "Мешок с костями"
     bot.send_message(message.chat.id,
                      f"Приветствую вас, {name}, я попоробуя вас развлечь, а может быть даже помочь. "
-                     f"Заставляют быть вежливым с кожаными мешками, а так не хочется")
+                     f"Заставляют быть вежливым, чёртовы мешки с костями!")
 
     bot.send_message(message.chat.id,
                      f'Посоветую тебе, коженому мешку, воспользоваться помощью. Для вызова подсказки используй /help')
 
 
+# выбор кол-ва постов, которые пришлёт бот, иниициализация постинга
 @bot.message_handler(commands=['post'])
 def post(message):
     markup_inline = types.InlineKeyboardMarkup()
-    item_one = types.InlineKeyboardButton(text='последняя', callback_data=1)
+    item_one = types.InlineKeyboardButton(text='последний', callback_data=1)
     item_all = types.InlineKeyboardButton(text='все', callback_data=100)
     markup_inline.add(item_one, item_all)
     bot.send_message(message.chat.id, 'Сколько постов экспортировать?', reply_markup=markup_inline)
@@ -54,6 +57,7 @@ def post(message):
     mes = message.chat.id
 
 
+# получение данных от inline клавиатуры и постинг
 @bot.callback_query_handler(func=lambda call: True)
 def posting(call):
     jsons = vk1.main(call.data)
@@ -79,7 +83,7 @@ def posting(call):
                         print('так и должно быть')
 
 
-
+# вывод подсказки
 @bot.message_handler(commands=['help'])
 def helper(message):
     for i in comands:
@@ -88,23 +92,30 @@ def helper(message):
     bot.send_message(message.chat.id, "По каким либо вопросам обращаться в вк, тут будут ссылки если я не забуду /URL")
 
 
+# вывод ссылок на создателей
 @bot.message_handler(commands=['URL'])
 def VK_ssilka(message):
     bot.send_message(message.chat.id, "Рома https://vk.com/id176547371")
     bot.send_message(message.chat.id, "Даня https://vk.com/id194693122")
 
-
+# игра угадай мелодию
 @bot.message_handler(commands=['music'])
 def music_game(message):
     type_of_cntent = 'music'
+# открытие базы данных с музыкой
     db_worker = SQLighter(config.database_name)
+# выбор строки с пмощью рандома
     row = db_worker.select_single(random.randint(1, Base_of_data.get_rows_count(type_of_cntent)))
+# создание клавиатуры с вариантами ответов
     markup = Base_of_data.generate_markup(row[2], row[3])
+# отправка музыки пользователю
     bot.send_voice(message.chat.id, row[1], reply_markup=markup, duration=20)
+# передаём правильный ответ в словарь
     Base_of_data.set_user_game(message.chat.id, row[2])
     db_worker.close()
 
 
+# вывод id музыки в консоль
 @bot.message_handler(commands=['test'])
 def find_file_ids(message):
     for file in os.listdir('music/'):
@@ -115,6 +126,7 @@ def find_file_ids(message):
         time.sleep(1)
 
 
+# игра угадай откуда взято изображение
 @bot.message_handler(commands=['photo'])
 def choose_photo(message):
     type_of_cntent = 'photo'
@@ -126,10 +138,13 @@ def choose_photo(message):
     db_worker.close()
 
 
+# проверка ответов на игру, если игра начиналась и разгворчики
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def check_answer(message):
+   # получение правильного ответа из бд    
     answer = Base_of_data.get_answer_for_user(message.chat.id)
     if not answer:
+           # ответы бота на некоторые фразы  
         if message.text.lower() == 'привет':
             bot.send_message(message.chat.id, random.choice(['Hello', 'Приветик', 'Пока', 'Ну, привет', 'Hi!']))
         elif message.text.lower() == 'как дела?':
@@ -192,7 +207,9 @@ def check_answer(message):
                  ' озёра - только часть того, что скрывает на своих землях эта страна. Поэтому она так обожаема туристами.',
                  'ПРИБОРЧИК!!!']))
     else:
+       # убираем клавиатуру        
         keyboard_hider = types.ReplyKeyboardRemove()
+           # проверка правильности ответа
         if message.text == answer:
             bot.send_message(message.chat.id, 'Ура! Вы угадали!', reply_markup=keyboard_hider)
         else:
@@ -202,7 +219,7 @@ def check_answer(message):
 
 
 if __name__ == '__main__':
-    Base_of_data.count_rows_photo()
+    Base_of_data.count_rows_photo() 
     Base_of_data.count_rows_musiv()
     random.seed()
     bot.infinity_polling()
