@@ -64,14 +64,17 @@ def posting(call):
             if i['attachments']:
                 for j in i['attachments']:
                     try:
-                        if j['photo']: # in i['attachments']:
+                        if j['type'] == 'photo':
                             url = j['photo']['sizes'][-1]['url']
                             photo = BytesIO(urllib.request.urlopen(url).read())
                             bot.send_chat_action(mes, 'upload_photo')
                             bot.send_photo(mes, photo)
-                        # elif 'doc' in i['attachments']:
-                        #     url = j['doc']['url']
-                        #     bot.send_video(mes, url)
+                        elif j['type'] == 'doc':
+                            url = j['doc']['url']
+                            bot.send_video(mes, url)
+                        elif j['type'] == 'video':
+                            url = j['video']['first_frame_1280']
+                            bot.send_video(mes, url)
                     except KeyError:
                         print('так и должно быть')
 
