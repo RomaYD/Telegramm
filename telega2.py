@@ -6,6 +6,7 @@ import random
 import Base_of_data
 from SQLighter import SQLighter
 from telebot import types
+import vk1
 
 bot = telebot.TeleBot(config.token)
 comands = {"start": "Приветствие и установка имени",
