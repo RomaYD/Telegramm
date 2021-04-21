@@ -64,7 +64,7 @@ def posting(call):
             if i['attachments']:
                 for j in i['attachments']:
                     try:
-                        if j['photo']# in i['attachments']:
+                        if j['photo']: # in i['attachments']:
                             url = j['photo']['sizes'][-1]['url']
                             photo = BytesIO(urllib.request.urlopen(url).read())
                             bot.send_chat_action(mes, 'upload_photo')
