@@ -4,8 +4,9 @@ import config
 import os
 
 bot = telebot.TeleBot(config.token)
-
+# Этот файл нужен для отладки 
 @bot.message_handler(commands=['test'])
+# Открытие музыкальных файлов и передача их id
 def find_file_ids(message):
     for file in os.listdir('music/'):
         if file.split('.')[-1] == 'ogg':
@@ -15,6 +16,7 @@ def find_file_ids(message):
         time.sleep(1)
 
 @bot.message_handler(commands=['test1'])
+# Открытие графических файлов и передача их id
 def find_file_ids(message):
     for file in os.listdir('photo/'):
         if file.split('.')[-1] == 'jpg':
