@@ -163,6 +163,12 @@ def check_answer(message):
         elif message.text.lower() == 'хмм':
             bot.send_message(message.chat.id, random.choice(['чьь',
                                                              'Что?']))
+        elif message.text.lower() == 'эй':
+            bot.send_message(message.chat.id, random.choice([f'Иди чаю попей, {name}',
+                                                             'Чего тебе, кожаный мешок?',
+                                                             'эээй-ээй-эй',
+                                                             'Патимейкер',
+                                                             'Уличный дэнсер! Фшик-фшик']))
         elif message.text.lower() == 'да':
             bot.send_message(message.chat.id, random.choice(['Нет',
                                                              'Балда']))
