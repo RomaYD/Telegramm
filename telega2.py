@@ -3,10 +3,13 @@ import config
 import os
 import time
 import random
-import Baze_of_data
+import Base_of_data
 from SQLighter import SQLighter
 from telebot import types
 import vk1
+from io import BytesIO
+import urllib
+from urllib import request
 
 bot = telebot.TeleBot(config.token)
 comands = {"start": "Приветствие и установка имени",
@@ -47,12 +50,31 @@ def post(message):
     item_all = types.InlineKeyboardButton(text='все', callback_data=100)
     markup_inline.add(item_one, item_all)
     bot.send_message(message.chat.id, 'Сколько постов экспортировать?', reply_markup=markup_inline)
+    global mes
+    mes = message.chat.id
 
-@bot.callback_query_handler(func = lambda call: True)
+
+@bot.callback_query_handler(func=lambda call: True)
 def posting(call):
     jsons = vk1.main(call.data)
     for i in jsons:
-        bot.send_message(call.data, i['text'])
+        if i['text']:
+            bot.send_message(mes, i['text'])
+        if i['attachments']:
+            if i['attachments']:
+                for j in i['attachments']:
+                    try:
+                        if j['photo']# in i['attachments']:
+                            url = j['photo']['sizes'][-1]['url']
+                            photo = BytesIO(urllib.request.urlopen(url).read())
+                            bot.send_chat_action(mes, 'upload_photo')
+                            bot.send_photo(mes, photo)
+                        # elif 'doc' in i['attachments']:
+                        #     url = j['doc']['url']
+                        #     bot.send_video(mes, url)
+                    except KeyError:
+                        print('так и должно быть')
+
 
 
 @bot.message_handler(commands=['help'])
@@ -104,7 +126,7 @@ def choose_photo(message):
 @bot.message_handler(func=lambda message: True, content_types=['text'])
 def check_answer(message):
     answer = Base_of_data.get_answer_for_user(message.chat.id)
-     if not answer:
+    if not answer:
         if message.text.lower() == 'привет':
             bot.send_message(message.chat.id, random.choice(['Hello', 'Приветик', 'Пока', 'Ну, привет', 'Hi!']))
         elif message.text.lower() == 'как дела?':
@@ -151,17 +173,21 @@ def check_answer(message):
                                                              'Спасибоооо))',
                                                              '-_-']))
         else:
-            bot.send_message(message.chat.id, random.choice(['Хм, кажется, кто-то из героев только что сломал единственный ключ от выхода из этого места.',
-                                                             'Все монстры которых убивал главный герой оказываются живыми людьми с проклятьем',
-                                                             'Враг признаётся вам в любви',
-                                                             'На самом деле вся история - это шизофрения',
-                                                             'На телефоне села зарядка',
-                                                             'В дом зашёл слон.',
-                                                             'Машина попала в аварию',
-                                                             'В звездолёте отвалились двигатели, и это герои даже ещё не взлетели.',
-                                                             'Это крошечная страна с населением 2211000 марсиан. На севере ограничена огромным озером, на юге находится река, на западе расположена горная местность, на востоке преобладают бескрайние равнины. Большую часть дохода страна получает от занятий кузнечным делом, рыбалкой и сельским хозяйством.',
-                                                             'Местные рассказывают, что здесь прекрасные пейзажи. Красивые холмы, величественные горы и небольшие озёра - только часть того, что скрывает на своих землях эта страна. Поэтому она так обожаема туристами.',
-                                                             'ПРИБОРЧИК!!!']))
+            bot.send_message(message.chat.id, random.choice(
+                ['Хм, кажется, кто-то из героев только что сломал единственный ключ от выхода из этого места.',
+                 'Все монстры которых убивал главный герой оказываются живыми людьми с проклятьем',
+                 'Враг признаётся вам в любви',
+                 'На самом деле вся история - это шизофрения',
+                 'На телефоне села зарядка',
+                 'В дом зашёл слон.',
+                 'Машина попала в аварию',
+                 'В звездолёте отвалились двигатели, и это герои даже ещё не взлетели.',
+                 'Это крошечная страна с населением 2211000 марсиан. На севере ограничена огромным озером, на юге находится река,'
+                 ' на западе расположена горная местность, на востоке преобладают бескрайние равнины. Большую часть'
+                 ' дохода страна получает от занятий кузнечным делом, рыбалкой и сельским хозяйством.',
+                 'Местные рассказывают, что здесь прекрасные пейзажи. Красивые холмы, величественные горы и небольшие'
+                 ' озёра - только часть того, что скрывает на своих землях эта страна. Поэтому она так обожаема туристами.',
+                 'ПРИБОРЧИК!!!']))
     else:
         keyboard_hider = types.ReplyKeyboardRemove()
         if message.text == answer:
