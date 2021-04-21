@@ -2,7 +2,7 @@ import vk_api
 import datetime
 import config_vk
 
-def main():
+def main(count_posts):
     login, password = config_vk.login, config_vk.password
     vk_session = vk_api.VkApi(login, password)
     try:
@@ -12,7 +12,7 @@ def main():
         return
     vk = vk_session.get_api()
     # Используем метод wall.get
-    response = vk.wall.get(count=1, owner_id=-199427155)
+    response = vk.wall.get(count=count_posts, owner_id=-199427155)
     if response['items']:
         return response['items']
         # for i in response['items']:
