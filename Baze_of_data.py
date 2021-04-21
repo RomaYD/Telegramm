@@ -34,7 +34,7 @@ def get_rows_count(type_of_cntent):
         rowsnum = slovar['rows_count1']
     return rowsnum
 
-# Записывает ответ пользователя и правильный ответ
+# Записывает правильный ответ по ключу - id сообщения
 def set_user_game(chat_id, estimated_answer):
     slovar[str(chat_id)] = estimated_answer
 
