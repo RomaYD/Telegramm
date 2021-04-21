@@ -3,7 +3,7 @@ import config
 import os
 import time
 import random
-import Base_of_data
+import Baze_of_data
 from SQLighter import SQLighter
 from telebot import types
 import vk1
@@ -37,9 +37,17 @@ def welcome(message):
 
 @bot.message_handler(commands=['post'])
 def post(message):
-    jsons = vk1.main()
+    markup_inline = types.InlineKeyboardMarkup()
+    item_one = types.InlineKeyboardButton(text='последняя', callback_data=1)
+    item_all = types.InlineKeyboardButton(text='все', callback_data=100)
+    markup_inline.add(item_one, item_all)
+    bot.send_message(message.chat.id, 'Сколько постов экспортировать?', reply_markup=markup_inline)
+
+@bot.callback_query_handler(func = lambda call: True)
+def posting(call):
+    jsons = vk1.main(call.data)
     for i in jsons:
-        bot.send_message(message.chat.id, i['text'])
+        bot.send_message(call.data, i['text'])
 
 
 @bot.message_handler(commands=['help'])
