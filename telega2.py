@@ -14,19 +14,24 @@ comands = {"start": "Приветствие и установка имени",
            "music": "Угадай мелодию",
            "photo": "Угадай картинку",
            "post": "Экспорт постов со стены сообщества",
-           "registration": "Регистрация, передача имени"
+           "registration": "Регистрация, передача имени, для этого после команды через пробел введите имя"
            }
 
 
-# @bot.message_handler(commands=['registration'])
-# def register(message):
-#     utils.set_name_from_user(message)
-#     name = utils.get_name_from_user()
+@bot.message_handler(commands=['registration'])
+def register(message):
+    mes = message.text.split()
+    del mes[0]
+    mes = ' '.join(mes)
+    Base_of_data.set_name_from_user(mes)
 
 
 @bot.message_handler(commands=['start'])
 def welcome(message):
-    name = message.from_user.first_name
+    if Base_of_data.get_name_from_user():
+        name = Base_of_data.get_name_from_user()
+    else:
+        name = message.from_user.first_name
     bot.send_message(message.chat.id,
                      f"Приветствую вас, {name}, я попоробуя вас развлечь, а может быть даже помочь. "
                      f"Заставляют быть вежливым с кожаными мешками, а так не хочется")
