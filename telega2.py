@@ -10,8 +10,9 @@ from telebot import types
 bot = telebot.TeleBot(config.token)
 comands = {"start": "Приветствие и установка имени",
            "help": "Помощь",
-           "game": "Угадай мелодию",
+           "music": "Угадай мелодию",
            "photo": "Угадай картинку",
+           "post": "Экспорт постов со стены сообщества",
            "registration": "Регистрация, передача имени"
            }
 
@@ -46,8 +47,8 @@ def VK_ssilka(message):
     bot.send_message(message.chat.id, "Даня https://vk.com/id194693122")
 
 
-@bot.message_handler(commands=['game'])
-def game(message):
+@bot.message_handler(commands=['music'])
+def music_game(message):
     type_of_cntent = 'music'
     db_worker = SQLighter(config.database_name)
     row = db_worker.select_single(random.randint(1, Base_of_data.get_rows_count(type_of_cntent)))
