@@ -34,12 +34,20 @@ def welcome(message):
                      f'Посоветую тебе, коженому мешку, воспользоваться помощью. Для вызова подсказки используй /help')
 
 
+@bot.message_handler(commands=['post'])
+def post(message):
+    jsons = vk1.main()
+    for i in jsons:
+        bot.send_message(message.chat.id, i['text'])
+
+
 @bot.message_handler(commands=['help'])
 def helper(message):
     for i in comands:
         mes = '/' + i + " " + comands[i]
         bot.send_message(message.chat.id, mes)
     bot.send_message(message.chat.id, "По каким либо вопросам обращаться в вк, тут будут ссылки если я не забуду /URL")
+
 
 @bot.message_handler(commands=['URL'])
 def VK_ssilka(message):
